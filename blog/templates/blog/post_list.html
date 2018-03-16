@@ -1,11 +1,28 @@
 {% extends 'blog/base.html' %}
 
 {% block content %}
+    <form id="searchform" action="{% url 'post_search' %}" method="get" accept-charset="utf-8">
+      <input class="searchfield" id="searchbox" name="search_author" type="text" placeholder="Search">
+      <button type="submit" class="search btn btn-default"><span class="glyphicon glyphicon-search"></span></button><br><br>
+    </form>
+    <form id="searchform" action="{% url 'post_search' %}" method="get" accept-charset="utf-8">
+      <div>
+	<p>
+	<label for="from">From: </label>     
+	<input id="date" type="date" name="from_date">
+	<label for="to">To: </label>
+	<input id="date" type="date" name="to_date">
+	<button type="submit" class="search btn btn-default"><span class="glyphicon glyphicon-search"></span></button><br><br>
+	</p>
+      </div>
+    </form>
     {% for post in posts %}
         <div class="post">
+	{% if post.published_date %}
             <div class="date">
                 {{ post.published_date }}
             </div>
+	{% endif %}
             <h1><a href="{% url 'post_detail' pk=post.pk %}">{{ post.title }}</a></h1>
             <p>{{ post.text|linebreaksbr }}</p>
         </div>

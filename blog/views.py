@@ -4,15 +4,34 @@ from django.utils import timezone
 from .forms import PostForm
 from django.shortcuts import redirect
 
-# Create your views here.
-
 def post_list(request):
-    posts = Post.objects.order_by('created_date')
-    return render(request, 'blog/post_list.html', {'posts' : posts})
+    if request.method == 'GET':
+        search_query = request.GET.get('search_author')
+        from_date = request.GET.get('from_date')
+        to_date = request.GET.get('to_date')
+        if search_query:
+            posts = Post.objects.filter(author__username__startswith=search_query)
+        elif from_date and to_date:
+            posts = Post.objects.filter(published_date__range=(from_date, to_date))
+        else:
+            posts = Post.objects.all()
+        return render(request, 'blog/post_list.html', {'posts' : posts})
+    else:
+        posts = Post.objects.order_by('created_date')
+        return render(request, 'blog/post_list.html', {'posts' : posts})
 
 def post_detail(request, pk):
     post = get_object_or_404(Post, pk=pk)
     return render(request, 'blog/post_detail.html', {'post': post})
+
+def post_search(request):
+    if request.method == 'GET':
+        search_query = request.GET.get('search_author')
+        if search_query:
+            posts = Post.objects.filter(author__username__startswith=search_query)
+        else:
+            posts = Post.objects.all()
+        return render(request, 'blog/post_list.html', {'posts' : posts})
 
 def post_new(request):
     if request.method == "POST":
